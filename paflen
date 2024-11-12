@@ -1,0 +1,24 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    print "#target\tquery\tidentity"
+    target_sum = 0
+    query_sum = 0
+    weighted_id_sum = 0
+}
+{
+    match($0, /id:f:([0-9.]+)/, id_match)
+    identity = id_match[1]
+    
+    target_len = $4 - $3
+    query_len = $9 - $8
+    
+    target_sum += target_len
+    query_sum += query_len
+    weighted_id_sum += (identity * (target_len + query_len))
+}
+END {
+    total_len = target_sum + query_sum
+    avg_identity = weighted_id_sum / total_len
+    printf "%d\t%d\t%.6f\n", target_sum, query_sum, avg_identity
+}
